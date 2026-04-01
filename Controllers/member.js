@@ -23,7 +23,7 @@ exports.getAllMember = async (req, res) => {
         res.status(200).json({
             message: members.length ? "Members fetched successfully" : "No members found",
             members,
-            totalMember
+            totalMembers: totalMember
         });
 
     } catch (err) {
@@ -90,7 +90,7 @@ exports.registerMember = async (req, res) => {
             });
 
             await newMember.save();
-            res.status(20).json({ message: "Member registered successfully", member: newMember });
+            res.status(201).json({ message: "Member registered successfully", member: newMember });
 
         } else {
             return res.status(409).json({ error: "No such Membership are there" })
@@ -117,7 +117,8 @@ exports.searchMember = async (req, res) => {
 
         res.status(200).json({
             message: members.length ? "Fetched Member Successfully" : "No Such members Registered yet",
-            members
+            members,
+            totalMembers: members.length
         });
 
     } catch (err) {
@@ -247,7 +248,7 @@ exports.inActiveMember = async (req, res) => {
         }).populate('membership');
 
           res.status(200).json({
-            message: member.length ? "Fetched members Successfully" : "No Such members is panding",
+            message: member.length ? "Fetched members Successfully" : "No Such members is inactive",
             members: member,
             totalMembers: member.length 
         });
@@ -283,7 +284,7 @@ exports.changeStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const member = await Member.findOneAndUpdate({ _id: id, gym: req.gym._id });
+        const member = await Member.findOne({ _id: id, gym: req.gym._id });
         if (!member) {
             return res.status(404).json({ 
                 error: "Member not found" 

@@ -58,7 +58,7 @@ const GeneralUser = () => {
             {
                 data.map((item, index) => {
                     return(
-                        <MemberCard item={item} />
+                        <MemberCard key={item._id} item={item} />
 
                     );
                 })

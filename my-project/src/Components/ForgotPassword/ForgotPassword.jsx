@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Loader from "../Loader/loader";
 import axios from "axios";
+import BASE_URL from '../../config';
 import {ToastContainer, toast} from "react-toastify";
 const ForgotPassword = () => {
     const [emailSubmit, setEmailSubmit] = useState(false);
@@ -23,7 +24,7 @@ const ForgotPassword = () => {
 
     const changePassword = async()=>{
         setLoader(true);
-        await axios.post("http://localhost:4000/auth/reset-password",{email:inputField.email,newPassword:inputField.newPassword}).then((response)=>{
+        await axios.post(`${BASE_URL}/auth/reset-password`,{email:inputField.email,newPassword:inputField.newPassword}).then((response)=>{
             toast.success(response.data.message);
             setLoader(false);
         }).catch(err =>{
@@ -36,7 +37,7 @@ const ForgotPassword = () => {
 
     const verifyOtp = async() =>{
         setLoader(true);
-        await axios.post("http://localhost:4000/auth/reset-password/checkOtp",{email:inputField.email, otp:inputField.otp}).then((response)=>{
+        await axios.post(`${BASE_URL}/auth/reset-password/checkOtp`,{email:inputField.email, otp:inputField.otp}).then((response)=>{
             setotpvalidate(true);
             setcontentvalue("Submit Your New Password");
             toast.success(response.data.message);
@@ -51,7 +52,7 @@ const ForgotPassword = () => {
 
     const sendOtp = async()=>{
         setLoader(true);
-        await axios.post("http://localhost:4000/auth/reset-password/sendOtp",{email:inputField.email}).then((response)=>{
+        await axios.post(`${BASE_URL}/auth/reset-password/sendOtp`,{email:inputField.email}).then((response)=>{
             setEmailSubmit(true);
             setcontentvalue("Submit Your OTP");
             toast.success(response.data.message);
@@ -105,3 +106,4 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+

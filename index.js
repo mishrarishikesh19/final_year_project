@@ -4,7 +4,7 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
 
-const PORT = process.env.PORT // 4000;
+const PORT = process.env.PORT || 4000;
 
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 app.use(cors({
@@ -32,5 +32,7 @@ app.use('/members', MemberRoutes);
 
 
 app.listen(PORT,()=>{
-    console.log("Server is rining on Port 4000 successfully")
+    console.log(`Server is running on Port ${PORT} successfully`)
 })
+
+
