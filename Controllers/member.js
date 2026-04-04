@@ -12,7 +12,7 @@ exports.getAllMember = async (req, res) => {
 
         let query = Member.find(filter)
             .populate('membership')
-            .sort({ createdAt: -1 });
+            .sort({ joiningDate: -1 });
 
         if (limit > 0) {
             query = query.skip(skip).limit(limit);
@@ -114,7 +114,7 @@ exports.searchMember = async (req, res) => {
                 { name: { $regex: '^' + searchTerm, $options: 'i' } },
                 { mobileNo: { $regex: '^' + searchTerm, $options: 'i' } }
             ]
-        }).populate('membership');
+        }).populate('membership').sort({ joiningDate: -1 });
 
         res.status(200).json({
             message: members.length ? "Fetched Member Successfully" : "No Such members Registered yet",
@@ -141,11 +141,11 @@ exports.monthlyMember = async (req, res) => {
 
         const member = await Member.find({
             gym: req.gym._id,
-            createdAt: {
+            joiningDate: {
                 $gte: startOfMonth,  // Greater than or equal to the first day of the month
                 $lte: endOfMonth     // Less than or equal to the last day of the month
             }
-        }).sort({ createdAt: -1 });
+        }).sort({ joiningDate: -1 });
 
         res.status(200).json({
             message: member.length ? "Fetched Members SuccessFully" : "No Such Member Registered yet",
@@ -166,6 +166,7 @@ exports.expiringWithin3Days = async (req, res) => {
         const today = new Date();
         const nextThreeDays = new Date();
         nextThreeDays.setDate(today.getDate() + 3);
+        nextThreeDays.setHours(23, 59, 59, 999); // End of the 3rd day
 
         const member = await Member.find({
             gym: req.gym._id,
@@ -191,16 +192,19 @@ exports.expiringWithin3Days = async (req, res) => {
 exports.expiringWithIn4To7Days = async (req, res) => {
     try {
         const today = new Date();
-        const nextFourDays = new Date();
-        nextFourDays.setDate(today.getDate() + 4);
+        const nextThreeDays = new Date();
+        nextThreeDays.setDate(today.getDate() + 3);
+        nextThreeDays.setHours(23, 59, 59, 999);
+
         const nextSevenDays = new Date();
         nextSevenDays.setDate(today.getDate() + 7);
+        nextSevenDays.setHours(23, 59, 59, 999);
 
         const member = await Member.find({
             gym: req.gym._id,
             nextBillDate: { 
-                $gte: nextFourDays, // Greater than or equal to 4 days later from todays
-                $lte: nextSevenDays  // Less than or equal to 7 days from todays
+                $gt: nextThreeDays, // Start after the end of within-3-days range
+                $lte: nextSevenDays  
             },
             status: "Active"
         }).populate('membership');
