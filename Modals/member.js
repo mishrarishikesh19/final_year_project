@@ -37,8 +37,12 @@ const memberScema = mongoose.Schema({
     nextBillDate:{
         type:Date,
         require:true,
+    },
+    joiningDate:{
+        type:Date,
+        default:new Date()
     }
-})
+},{timestamps:true})
 
 const memberModel = mongoose.model("member",memberScema)
 module.exports = memberModel;

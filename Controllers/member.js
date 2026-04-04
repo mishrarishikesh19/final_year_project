@@ -86,6 +86,7 @@ exports.registerMember = async (req, res) => {
                 gym: req.gym._id,
                 profilePic,
                 nextBillDate,
+                joiningDate: new Date(joiningDate),
                 lastPayment: new Date(joiningDate)
             });
 

@@ -22,6 +22,9 @@ const MemberCard = ({item}) => {
             {"+91 "+ item?.mobileNo}
           </div>
            <div className='mx-auto mt-2 text-center text-xl font-mono'>
+            Joined Date : {item?.joiningDate?.slice(0,10).split("-").reverse().join("-")}
+          </div>
+           <div className='mx-auto mt-2 text-center text-xl font-mono'>
             Next Bill Date : {item?.nextBillDate.slice(0,10).split("-").reverse().join("-")}
           </div>
         </Link>
