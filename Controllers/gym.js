@@ -53,8 +53,7 @@ exports.login = async(req,res)=>{
                     profilePic: gym.profilePic
                 }
             });
-            
-            res.json({message:"login in successfully ", success:"true",gym,token});
+            return;
 
         }else{
             res.status(400).json({error:"Invaild credentials"});
@@ -68,52 +67,96 @@ exports.login = async(req,res)=>{
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
-    suth:{
+    auth:{
         user:process.env.SENDER_EMAIL,
         pass:process.env.EMAIL_PASSWORD
     }
 });
 
-exports.sendOtp = async (req,res)=>{
-    try{
-        const {email} = req.body;
-        const gym = await Gym.findOne({email});
-        if(gym){
+// exports.sendOtp = async (req,res)=>{
+//     try{
+//         const {email} = req.body;
+//         const gym = await Gym.findOne({email});
+//         if(gym){
 
-            const buffer = crypto.randomBytes(4); // Get random bytes
-            const token = buffer.readUInt32BE(0) % 900000 + 100000; // Modulo to get a 6-digit number
-            gym.resetPasswordToken = token;
-            gym.resetPasswordExpires = Date.now() + 3600000; // 1 hours expiry date
-            await gym.save();
+//             const buffer = crypto.randomBytes(4); // Get random bytes
+//             const token = buffer.readUInt32BE(0) % 900000 + 100000; // Modulo to get a 6-digit number
+//             gym.resetPasswordToken = token;
+//             gym.resetPasswordExpires = Date.now() + 3600000; // 1 hours expiry date
+//             await gym.save();
 
-            //for email sending
-            const mailOptions = {
-                from: "rk6013471@gmail.com",
-                to: email,
-                subject: "Password Reset",
-                text: `Your requested a password reset. Your OTP is : ${token}`
-            };
+//             //for email sending
+//             const mailOptions = {
+//                 from: process.env.SENDER_EMAIL,
+//                 to: email,
+//                 subject: "Password Reset",
+//                 text: `Your requested a password reset. Your OTP is : ${token}`
+//             };
 
 
-            transporter.sendMail(mailOptions,(error,info) =>{
-                if(error){
-                    res.status(500).json({error:"Server error ",errorMsg:error});
-                }else{
-                    res.status(200).json({message:"OTP sent to your email"});
-                }
-            });
+//             transporter.sendMail(mailOptions,(error,info) =>{
+//                 if(error){
+//                     res.status(500).json({error:"Server error ",errorMsg:error});
+//                 }else{
+//                     res.status(200).json({message:"OTP sent to your email"});
+//                 }
+//             });
 
-        }else{
-            return res.status(400).json({error:"Gym not found with this email"});
+//         }else{
+//             return res.status(400).json({error:"Gym not found with this email"});
 
-        }
+//         }
 
-    }catch(err){
-        res.status(500).json({
-            error:"Server Error"
-        })
+//     }catch(err){
+//         res.status(500).json({
+//             error:"Server Error"
+//         })
+//     }
+// }
+
+exports.sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log("📩 Email received:", email);
+
+    const gym = await Gym.findOne({ email });
+    console.log("👤 Gym found:", gym);
+
+    if (!gym) {
+      return res.status(400).json({ error: "Gym not found with this email" });
     }
-}
+
+    const token = Math.floor(100000 + Math.random() * 900000);
+    gym.resetPasswordToken = token;
+    gym.resetPasswordExpires = Date.now() + 3600000;
+    await gym.save();
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your OTP is: ${token}`,
+    };
+
+    console.log("📨 Sending mail...");
+    
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("✅ Mail sent:", info.response);
+
+    return res.status(200).json({
+      message: "OTP sent successfully",
+    });
+
+  } catch (err) {
+    console.log("🔥 FULL ERROR:", err); // 👈 YAHI MAIN CHEEZ HAI
+
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: err.message,
+    });
+  }
+};
 
 exports.checkOtp = async(req,res)=>{
     try{

@@ -1,5 +1,6 @@
 import React,{useState, useEffect} from 'react'
 import axios from 'axios'
+import BASE_URL from '../../config';
 
 import Stack from '@mui/material/Stack';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -38,20 +39,21 @@ const Addmembers = () => {
   }
 
   const fetchMembership = async()=>{
-    await axios.get("http://localhost:4000/plans/get-membership",{withCredentials:true}).then((response)=>{
-      setMembershipList(response.data.membership);
-      if (response.data.memberships.length === 0) {
+    await axios.get(`${BASE_URL}/plans/get-membership`,{withCredentials:true}).then((response)=>{
+      const memberships = response.data.memberships || [];
+      setMembershipList(memberships);
+      if (memberships.length === 0) {
         return toast.error("No any Membership added yet",{
           className:"text-lg"
         })
       }else{
-        let a = response.data.membership[0]._id;
+        let a = memberships[0]._id;
         setSelectedOptions(a);
-        setInputField({...inputField, membership:a})
+        setInputField(prev => ({...prev, membership:a}))
       }
     }).catch((err)=>{
       console.log(err);
-      toast.error("Something wrong Happedned");
+      toast.error("Failed to fetch memberships");
     })
 
   }
@@ -68,7 +70,7 @@ const Addmembers = () => {
   }
 
   const handleRegisterButton = async()=>{
-    await axios.post("http://localhost:4000/members/register-member", inputField,{withCredentials:true}).then((response)=>{
+    await axios.post(`${BASE_URL}/members/register-member`, inputField,{withCredentials:true}).then((response)=>{
       toast.success("Added Successfully");
       setTimeout(()=>{
         window.location.reload();

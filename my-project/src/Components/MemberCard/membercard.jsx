@@ -7,7 +7,12 @@ const MemberCard = ({item}) => {
         <Link to={`/member/${item?._id}`} className='bg-white rounded-lg p-3 hover:bg-gradient-to-r from-indigo-500  via-purple-500 to-pink-500 hover:text-white cursor-pointer'>
           <div className='w-28 h-28 flex justify-center relative items-center border-2 p-1 mx-auto rounded-full'>
             <img className='w-full h-full rounded-full' src={item?.profilePic} alt='profile pic'/>
-            <CircleIcon className='absolute top-0 left-0' sx={{color:item?.status === 'active' ? 'greenyellow' : 'red'}}/>
+            <div className='absolute top-0 left-0 flex items-center bg-white rounded-full px-1 shadow-sm'>
+              <CircleIcon sx={{color:item?.status === 'Active' ? 'greenyellow' : 'red', fontSize:'14px'}}/>
+              <span className='text-[10px] font-bold ml-1' style={{color:item?.status === 'Active' ? 'greenyellow' : 'red'}}>
+                {item?.status}
+              </span>
+            </div>
           </div>
 
           <div className='mx-auto mt-5 text-center text-xl font-semibold font-mono'> 

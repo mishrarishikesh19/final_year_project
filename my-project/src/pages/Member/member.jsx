@@ -11,10 +11,11 @@ import MemberCard from "../../Components/MemberCard/membercard";
 import Addmembership from "../../Components/Addmembership/addmembership";
 import Addmembers from "../../Components/Addmembars/addmembers";
 import axios from "axios";
+import BASE_URL from '../../config';
 import { ToastContainer, toast } from "react-toastify";
 const Member = () => {
-  const [addMembership, setAddmembership] = useState(false);
-  const [addMember, setAddmember] = useState(false);
+  const [addMembership, setAddMembership] = useState(false);
+  const [addMember, setAddMember] = useState(false);
   const [data, setData] = useState([]);
   const [skip, setSkip] = useState(0);
   const [search, setSearch] = useState("");
@@ -30,15 +31,14 @@ const Member = () => {
   const [noOfPage, setNoOfPage] = useState(0);
 
   useEffect(() => {
-    fetchData();
+    fetchData(0, 9);
   }, []);
 
   const fetchData = async (skip, limits) => {
     await axios
-      .get(
-        `http://localhost:4000/members/all-member?skip=${skip}&limit=${limits}`,
-        { withCredentials: true },
-      )
+      .get(`${BASE_URL}/members/all-member?skip=${skip}&limit=${limits}`, {
+        withCredentials: true,
+      })
       .then((response) => {
         console.log(response);
         let totalData = response.data.totalMembers; //fetch from api
@@ -63,13 +63,14 @@ const Member = () => {
       });
   };
 
-  const handleMembership = () => {
-    setAddmembership((prev) => !prev);
-  };
 
-  const handleMembers = () => {
-    setAddmember((prev) => !prev);
-  };
+const handleMembership = () => {
+  setAddMembership((prev) => !prev);
+};
+
+const handleMembers = () => {
+  setAddMember((prev) => !prev);
+};
 
   const handlePrev = () => {
     if (currentPage !== 1) {
@@ -106,7 +107,7 @@ const Member = () => {
     if (search !== "") {
       setIsSearchModeOn(true);
       await axios
-        .get(`http://localhost:4000/members/searched-member?search=${search}`, {
+        .get(`${BASE_URL}/members/searched-member?searchTerm=${search}`, {
           withCredentials: true,
         })
         .then((response) => {
@@ -204,23 +205,25 @@ const Member = () => {
 
       <div className="bg-slate-100 p-5 mt-5 rounded-lg grid gap-2 grid-cols-3 overflow-x-auto h-[65%]">
         {data.map((item, index) => {
-          return <MemberCard item={item} />;
+          return <MemberCard key={item._id} item={item} />;
         })}
       </div>
+
       {addMembership && (
-        <Modal
-          header="Add Membership"
-          handleClose={handleMembership}
-          content={<Addmembership handleClose={handleMembership} />}
-        />
-      )}
-      {addMember && (
-        <Modal
-          header={"Add New Member"}
-          handleClose={handleMembers}
-          content={<Addmembers />}
-        />
-      )}
+  <Modal
+    header="Add Membership"
+    handleClose={handleMembership}
+    content={<Addmembership handleClose={handleMembership} />}
+  />
+)}
+
+{addMember && (
+  <Modal
+    header="Add New Member"
+    handleClose={handleMembers}
+    content={<Addmembers handleClose={handleMembers} />}
+  />
+)}
       <ToastContainer />
     </div>
   );

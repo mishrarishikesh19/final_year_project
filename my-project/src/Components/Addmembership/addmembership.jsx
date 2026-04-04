@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import BASE_URL from '../../config';
 import {toast, ToastContainer} from 'react-toastify';
 
 const Addmembership = ({handleClose}) => {
@@ -12,13 +13,12 @@ const Addmembership = ({handleClose}) => {
   };
 
   const fetchMembership = async()=>{
-    await axios.get('http://localhost:4000/plans/add-membership',{withCredentials:true}).then((res)=>{
+    await axios.get(`${BASE_URL}/plans/get-membership`,{withCredentials:true}).then((res)=>{
       console.log(res);
-      setMembership(res.data.membership)
-      toast.success(res.data.membership.length+"Membership Fetched")
+      setMembership(res.data.memberships || [])
     }).catch(err=>{
       console.log(err);
-      toast.error("something wrong Happend");
+      toast.error("something wrong Happened");
     })
   }
  
@@ -32,8 +32,8 @@ const Addmembership = ({handleClose}) => {
             return toast.error("Please enter both months and price");
         }
         try {
-            const res = await axios.post('http://localhost:4000/plans/add-membership', inputField, { withCredentials: true });
-            if (res.status === 201) {
+            const res = await axios.post(`${BASE_URL}/plans/add-membership`, inputField, { withCredentials: true });
+            if (res.status === 200 || res.status === 201) {
                 toast.success(res.data.message);
                 fetchMembership();
                 setInputField({ months: "", price: "" });
@@ -48,7 +48,7 @@ const Addmembership = ({handleClose}) => {
     <div className="text-black">
             <div className='flex flex-wrap gap-5 items-center justify-center'>
                 {membership.map((item, index) => (
-                  <div className="text-lg bg-slate-900 text-white border-2 pl-2 pr-2 flex-col gap-3 justify-between pt-1 pb-1 rounded-xl font-semibold hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 ">
+                  <div key={item._id} className="text-lg bg-slate-900 text-white border-2 pl-2 pr-2 flex-col gap-3 justify-between pt-1 pb-1 rounded-xl font-semibold hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 ">
                     <div>{item.months} Month Membership </div>
                     <div>RS {item.price}</div>
                   </div>
