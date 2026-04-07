@@ -332,3 +332,53 @@ exports.updateMemberPlan = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+
+exports.getDashboardStats = async (req, res) => {
+    try {
+        const gymId = req.gym._id;
+        const now = new Date();
+
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        const nextThreeDays = new Date();
+        nextThreeDays.setDate(now.getDate() + 3);
+        nextThreeDays.setHours(23, 59, 59, 999);
+
+        const nextSevenDays = new Date();
+        nextSevenDays.setDate(now.getDate() + 7);
+        nextSevenDays.setHours(23, 59, 59, 999);
+
+        const [
+            totalMembers,
+            monthlyJoined,
+            expiringSoon3Days,
+            expiringSoon7Days,
+            expiredMembers,
+            inactiveMembers
+        ] = await Promise.all([
+            Member.countDocuments({ gym: gymId }),
+            Member.countDocuments({ gym: gymId, joiningDate: { $gte: startOfMonth, $lte: endOfMonth } }),
+            Member.countDocuments({ gym: gymId, nextBillDate: { $gt: now, $lte: nextThreeDays }, status: "Active" }),
+            Member.countDocuments({ gym: gymId, nextBillDate: { $gt: nextThreeDays, $lte: nextSevenDays }, status: "Active" }),
+            Member.countDocuments({ gym: gymId, nextBillDate: { $lte: now }, status: "Active" }),
+            Member.countDocuments({ gym: gymId, status: "InActive" })
+        ]);
+
+        res.status(200).json({
+            success: true,
+            stats: {
+                totalMembers,
+                monthlyJoined,
+                expiringSoon3Days,
+                expiringSoon7Days,
+                expiredMembers,
+                inactiveMembers
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}

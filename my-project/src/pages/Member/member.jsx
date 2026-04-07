@@ -130,7 +130,7 @@ const handleMembers = () => {
   };
 
   return (
-    <div className="text-black p`-2 h-[100vh] w-full">
+    <div className="text-black p-2 h-[100vh] w-full">
       {/* Block for banner */}
       <div className="border-2 bg-slate-900 flex justify-between w-full text-white rounded-lg p-3">
         <div
@@ -173,7 +173,7 @@ const handleMembers = () => {
       </div>
 
       <div className="mt-5 text-xl flex justify-between text-slate-900 ">
-        <div>Total Members {isSearchModeOn ? totalData : null}</div>
+        <div>Total Members : {totalData}</div>
         {!isSearchModeOn ? (
           <div className="flex gap-5">
             <div>

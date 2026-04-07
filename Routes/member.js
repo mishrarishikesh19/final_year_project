@@ -16,6 +16,7 @@ router.get('/within-4-7-expiring', auth, MemberController.expiringWithIn4To7Days
 router.get('/expired-member', auth , MemberController.expiredMember);
 router.get('/inactive-member', auth , MemberController.inActiveMember);
 
+router.get('/get-dashboard-stats', auth, MemberController.getDashboardStats);
 // route to get single member details, used by MemberDetail page
 router.get('/get-member-details/:id', auth, MemberController.getMemberDetails);
 

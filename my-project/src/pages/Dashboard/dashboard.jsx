@@ -8,9 +8,33 @@ import ErrorIcon from '@mui/icons-material/Error';
 import ReportIcon from '@mui/icons-material/Report';
 import Sidebar from "../../Components/Sidebar/sidebar";
 import {Link} from 'react-router-dom';
+import { getDashboardStats } from "./dashboardData";
+
 const Dashboard = () => {
     const [accordianDashboard,setAccordianDashboard]= useState(false);
+    const [stats, setStats] = useState({
+        totalMembers: 0,
+        monthlyJoined: 0,
+        expiringSoon3Days: 0,
+        expiringSoon7Days: 0,
+        expiredMembers: 0,
+        inactiveMembers: 0
+    });
     const ref =useRef();
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await getDashboardStats();
+                if (data.success) {
+                    setStats(data.stats);
+                }
+            } catch (error) {
+                console.error("Failed to fetch dashboard stats", error);
+            }
+        };
+        fetchStats();
+    }, []);
 
     useEffect(()=>{
         const checkIfClickedOutside = e =>{
@@ -53,7 +77,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <PeopleAltIcon sx={{color:"green",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">Joined Members</p>
+                        <p className="text-xl my-3 font-semibold font-mono">Joined Members : {stats.totalMembers}</p>
                     </div>
                 </Link>
 
@@ -62,7 +86,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <SignalCellularAltIcon sx={{color:"purple",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">Monthely joined</p>
+                        <p className="text-xl my-3 font-semibold font-mono">Monthely joined : {stats.monthlyJoined}</p>
                     </div>
                 </Link>
 
@@ -71,7 +95,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <AccessAlarmsIcon sx={{color:"red",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">Expiring within 3 days</p>
+                        <p className="text-xl my-3 font-semibold font-mono">Expiring within 3 days : {stats.expiringSoon3Days}</p>
                     </div>
                 </Link>
 
@@ -80,7 +104,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <AccessAlarmsIcon sx={{color:"red",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">Expiring within 4-7 days</p>
+                        <p className="text-xl my-3 font-semibold font-mono">Expiring within 4-7 days : {stats.expiringSoon7Days}</p>
                     </div>
                 </Link>
 
@@ -89,7 +113,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <ErrorIcon sx={{color:"red",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">Expired</p>
+                        <p className="text-xl my-3 font-semibold font-mono">Expired : {stats.expiredMembers}</p>
                     </div>
                 </Link>
 
@@ -98,7 +122,7 @@ const Dashboard = () => {
                     <div className="h-3 rounded-t-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="py-7 px-5 flex-col justify-center items-center w-full text-center rounded-b-lg hover:bg-slate-900 hover:text-white">
                         <ReportIcon sx={{color:"Brown",fontSize:"50px"}}/>
-                        <p className="text-xl my-3 font-semibold font-mono">InActive Members</p>
+                        <p className="text-xl my-3 font-semibold font-mono">InActive Members : {stats.inactiveMembers}</p>
                     </div>
                 </Link>
             </div>
